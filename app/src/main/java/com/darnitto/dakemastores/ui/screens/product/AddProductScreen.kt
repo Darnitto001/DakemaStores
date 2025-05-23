@@ -1,76 +1,247 @@
 package com.darnitto.dakemastores.ui.screens.product
 
-
-import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.darnitto.dakemastores.data.ProductDatabase
-import com.darnitto.dakemastores.model.Product
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.darnitto.dakemastores.R
 
-class ProductViewModel(app: Application) : AndroidViewModel(app) {
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.toSize
+import com.darnitto.dakemastores.navigation.ROUT_ADD_PRODUCT
+import com.darnitto.dakemastores.navigation.ROUT_PRODUCT_LIST
+import com.darnitto.dakemastores.ui.theme.newblue
+import com.darnitto.dakemastores.viewmodel.ProductViewModel
 
-    private val context = app.applicationContext
-    private val productDao = ProductDatabase.getDatabase(app).productDao()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) {
+    var name by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var showMenu by remember { mutableStateOf(false) }
 
-    val allProducts: LiveData<List<Product>> = productDao.getAllProducts()
+    val context = LocalContext.current
 
-    fun addProduct(name: String, price: Double, phone: String, imageUri: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val savedImagePath = saveImageToInternalStorage(Uri.parse(imageUri))
-            val newProduct = Product(
-                name = name,
-                price = price,
-                phone = phone,
-                imagePath = savedImagePath //use saved image path
+    // Image Picker Launcher
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            Log.d("ImagePicker", "Selected image URI: $it")
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Add Product", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Product List") },
+                            onClick = {
+                                navController.navigate(ROUT_PRODUCT_LIST)
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Add Product") },
+                            onClick = {
+                                navController.navigate(ROUT_ADD_PRODUCT)
+                                showMenu = false
+                            }
+                        )
+                    }
+                }
             )
-            productDao.insertProduct(newProduct)
-        }
-    }
+        },
+        bottomBar = {
+            BottomNavigationBar(navController)
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(newblue)
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Product Name
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Product Name") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.baseline_architecture_24), contentDescription = "Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-    fun updateProduct(updatedProduct: Product) {
-        viewModelScope.launch(Dispatchers.IO) {
-            productDao.updateProduct(updatedProduct)
-        }
-    }
+                Spacer(modifier = Modifier.height(10.dp))
 
-    fun deleteProduct(product: Product) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // Delete image from storage
-            deleteImageFromInternalStorage(product.imagePath)
-            productDao.deleteProduct(product)
-        }
-    }
+                // Product Price
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { Text("Product Price") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.baseline_architecture_24), contentDescription = "Price") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-    // Save image permanently to internal storage
-    private fun saveImageToInternalStorage(uri: Uri): String {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val fileName = "IMG_${System.currentTimeMillis()}.jpg"
-        val file = File(context.filesDir, fileName)
 
-        inputStream?.use { input ->
-            FileOutputStream(file).use { output ->
-                input.copyTo(output)
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                //Category
+                // Start of Text Field with a dropdown
+                var mExpanded by remember { mutableStateOf(false) }
+                val options = listOf("Electronics", "Washing", "Groceries", "Clothing")
+                var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+                val icon = if (mExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+
+                Column() {
+                    OutlinedTextField(
+                        value = category,
+                        onValueChange = { category = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                mTextFieldSize = coordinates.size.toSize()
+                            },
+                        label = {Text("Choose product category")},
+                        trailingIcon = {
+                            Icon(icon,"contentDescription",
+                                Modifier.clickable { mExpanded = !mExpanded })
+                        }
+                    )
+                    DropdownMenu(
+                        expanded = mExpanded,
+                        onDismissRequest = { mExpanded = false },
+                        modifier = Modifier.width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                    ) {
+                        options.forEach {
+
+                                label -> DropdownMenuItem(
+                            text = { Text(text = label)},
+                            onClick = {
+                                category = label
+                                mExpanded = false
+                            })
+
+
+                        }
+                    }
+                }
+                //End of TextField with dropdown
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Image Picker Box
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .background(Color.LightGray, shape = RoundedCornerShape(10.dp))
+                        .clickable { imagePicker.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (imageUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = imageUri),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(painter = painterResource(R.drawable.net), contentDescription = "Pick Image")
+                            Text("Tap to pick image", color = Color.DarkGray)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Add Product Button
+                Button(
+                    onClick = {
+                        val priceValue = price.toDoubleOrNull()
+                        if (priceValue != null) {
+                            imageUri?.toString()?.let { viewModel.addProduct(name, priceValue, category,it) }
+                            navController.popBackStack()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                ) {
+                    Text("Add Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
+    )
+}
 
-        return file.absolutePath
-    }
+// Bottom Navigation Bar Component
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    NavigationBar(
+        containerColor = Color(0xFF6F6A72),
+        contentColor = Color.White
+    ) {
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Product List") },
+            label = { Text("Home") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Product") },
+            label = { Text("Add") }
+        )
 
-    private fun deleteImageFromInternalStorage(path: String) {
-        try {
-            val file = File(path)
-            if (file.exists()) {
-                file.delete()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
+            icon = { Icon(painter = painterResource(R.drawable.profile), contentDescription = "") },
+            label = { Text("Profile") }
+        )
     }
 }

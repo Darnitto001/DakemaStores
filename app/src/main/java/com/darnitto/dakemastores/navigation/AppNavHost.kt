@@ -1,5 +1,7 @@
 package com.darnitto.dakemastores.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,16 +21,27 @@ import com.darnitto.dakemastores.ui.screens.home.HomeScreen
 import com.darnitto.dakemastores.viewmodel.AuthViewModel
 import com.darnitto.dakemastores.ui.screens.auth.LoginScreen
 import com.darnitto.dakemastores.ui.screens.auth.RegisterScreen
+import com.darnitto.dakemastores.ui.screens.category.CategoryScreen
 import com.darnitto.dakemastores.ui.screens.dashboard.DashboardScreen
 import com.darnitto.dakemastores.ui.screens.detail.ProductDetailScreen
+import com.darnitto.dakemastores.ui.screens.item.BeautyScreen
+import com.darnitto.dakemastores.ui.screens.item.ElectronicsScreen
+import com.darnitto.dakemastores.ui.screens.item.FashionScreen
+import com.darnitto.dakemastores.ui.screens.item.HealthScreen
+import com.darnitto.dakemastores.ui.screens.item.KitchenScreen
+import com.darnitto.dakemastores.ui.screens.item.SportsScreen
+import com.darnitto.dakemastores.ui.screens.item.ToolsScreen
+import com.darnitto.dakemastores.ui.screens.item.ToysScreen
 import com.darnitto.dakemastores.ui.screens.notification.NotificationsScreen
+import com.darnitto.dakemastores.ui.screens.product.AddProductScreen
 import com.darnitto.dakemastores.ui.screens.product.EditProductScreen
-import com.darnitto.dakemastores.ui.screens.product.ProductViewModel
-import com.darnitto.dakemastores.ui.screens.product.ProductlistingScreen
+import com.darnitto.dakemastores.ui.screens.product.ProductListScreen
 import com.darnitto.dakemastores.ui.screens.service.ServicesScreen
 import com.darnitto.dakemastores.ui.screens.splash.SplashScreen
+import com.darnitto.dakemastores.viewmodel.OrderViewModel
+import com.darnitto.dakemastores.viewmodel.ProductViewModel
 
-
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
@@ -37,7 +50,7 @@ fun AppNavHost(
     productViewModel: ProductViewModel = viewModel(),
 
     ) {
-
+    val orderViewModel: OrderViewModel = viewModel()
     val context = LocalContext.current
     NavHost(
         navController = navController,
@@ -76,6 +89,43 @@ fun AppNavHost(
         composable(ROUT_ORDER) {
             SplashScreen(navController)
         }
+
+        composable(ROUT_ELECTRONICS) {
+            ElectronicsScreen(navController)
+        }
+
+        composable(ROUT_TOOLS) {
+            ToolsScreen(navController)
+        }
+
+        composable(ROUT_TOYS) {
+            ToysScreen(navController)
+        }
+
+        composable(ROUT_FASHION) {
+            FashionScreen(navController)
+        }
+
+        composable(ROUT_KITCHEN) {
+            KitchenScreen(navController)
+        }
+
+        composable(ROUT_HEALTH) {
+            HealthScreen(navController)
+        }
+
+        composable(ROUT_BEAUTY) {
+            BeautyScreen(navController)
+        }
+
+        composable(ROUT_SPORTS) {
+            SportsScreen(navController)
+        }
+
+        composable(ROUT_CATEGORY) {
+            CategoryScreen(navController)
+        }
+
 
 
 
@@ -146,7 +196,7 @@ fun AppNavHost(
         }
 
         composable(ROUT_PRODUCT_LIST) {
-            ProductlistingScreen(navController, productViewModel)
+            ProductListScreen(navController, productViewModel)
         }
 
         composable(

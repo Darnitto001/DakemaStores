@@ -32,6 +32,8 @@ import androidx.navigation.NavController
 import com.darnitto.dakemastores.R
 import com.darnitto.dakemastores.model.User
 import com.darnitto.dakemastores.navigation.ROUT_LOGIN
+import com.darnitto.dakemastores.ui.theme.newblue
+import com.darnitto.dakemastores.ui.theme.newyellow
 import com.darnitto.dakemastores.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +59,7 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .paint(painter = painterResource(R.drawable.app), contentScale = ContentScale.FillBounds)
+            .background(newblue)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -67,7 +69,8 @@ fun RegisterScreen(
             Text(
                 "Create Your Account",
                 fontSize = 40.sp,
-                fontFamily = FontFamily.Cursive
+                fontFamily = FontFamily.Cursive,
+                color = newyellow
             )
         }
 
@@ -103,7 +106,7 @@ fun RegisterScreen(
 
         //Role
         var role by remember { mutableStateOf("user") }
-        val roleOptions = listOf("user", "admin")
+        val roleOptions = listOf("Buyer", "Seller")
         var expanded by remember { mutableStateOf(false) }
 
         ExposedDropdownMenuBox(
@@ -184,7 +187,7 @@ fun RegisterScreen(
                 .height(50.dp)
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF00C6FF), Color(0xFF0072FF))
+                        colors = listOf(Color(0xFFFFC107), Color(0xFFCDDC39))
                     ),
                     shape = MaterialTheme.shapes.medium
                 ),

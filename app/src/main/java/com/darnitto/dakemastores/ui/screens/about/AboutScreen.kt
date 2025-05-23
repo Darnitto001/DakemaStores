@@ -14,5 +14,7 @@ fun AboutScreen(navController: NavController){
 @Preview(showBackground = true)
 @Composable
 fun AboutScreenPreview(){
-    AboutScreen(navController= rememberNavController())
+
+    AboutScreen(rememberNavController())
+
 }

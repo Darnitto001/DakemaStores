@@ -1,5 +1,6 @@
 package com.darnitto.dakemastores.ui.screens.contact
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.darnitto.dakemastores.ui.theme.newblue
+import com.darnitto.dakemastores.ui.theme.newblue1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,36 +111,61 @@ fun ContactScreen(navController: NavController){
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
+
             ) {
 
 
                 //Main Contents of the page
-                Text(text = "Welcome to Homescreen Screen", fontSize = 20.sp)
+                Text(text = "Contact Screen", fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("This is where the main content goes.")
+                Text(text = "We'd love to hear from you!", fontSize = 22.sp, color = Color.White)
+                Spacer(modifier = Modifier.height(16.dp))
 
+                Text(text = "Email: support@dakemastores.com", color = Color.White, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(8.dp))
 
+                Text(text = "Phone: +234 800 000 0000", color = Color.White, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(8.dp))
 
+                Text(text = "Address: 123 Market Lane, Lagos", color = Color.White, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(16.dp))
 
+                Text(text = "Need help with an order or have a question?", fontSize = 16.sp, color = Color.White)
+                Spacer(modifier = Modifier.height(8.dp))
 
-
-
-
-
-
-
-
+                // Add buttons or links for actions like FAQ, Live Chat etc.
+                // Example:
+                // Button(onClick = { /* navigate to FAQ */ }) {
+                //     Text("Visit Help Center")
+                // }
             }
         }
-        //End of Content
     )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //End of Content
+
 
     //End of scaffold
 
 
 
 
-}
+
 
 @Preview(showBackground = true)
 @Composable

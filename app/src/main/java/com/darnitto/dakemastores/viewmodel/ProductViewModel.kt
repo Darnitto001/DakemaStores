@@ -5,28 +5,29 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.darnitto.dakemastores.data.ProductDatabase
 import com.darnitto.dakemastores.model.Product
-import com.google.android.gms.analytics.ecommerce.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
+
 class ProductViewModel(app: Application) : AndroidViewModel(app) {
 
     private val context = app.applicationContext
     private val productDao = ProductDatabase.getDatabase(app).productDao()
 
-    val allProducts: LiveData<List<Product>> = productDao.getAllProducts()
+    val allProducts: LiveData<List<com.darnitto.dakemastores.model.Product>> = productDao.getAllProducts()
 
-    fun addProduct(name: String, price: Double, phone: String, imageUri: String) {
+    fun addProduct(name: String, price: Double, category: String, imageUri: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val savedImagePath = saveImageToInternalStorage(Uri.parse(imageUri))
             val newProduct = Product(
                 name = name,
                 price = price,
-                phone = phone,
+                category = category,
                 imagePath = savedImagePath // use saved image path
             )
             productDao.insertProduct(newProduct)

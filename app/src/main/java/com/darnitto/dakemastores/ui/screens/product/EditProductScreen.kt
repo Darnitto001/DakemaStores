@@ -22,6 +22,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.darnitto.dakemastores.model.Product
 import com.darnitto.dakemastores.navigation.ROUT_ADD_PRODUCT
 import com.darnitto.dakemastores.navigation.ROUT_PRODUCT_LIST
 import com.darnitto.dakemastores.viewmodel.ProductViewModel

@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.darnitto.dakemastores.ui.theme.newblack
 import com.darnitto.dakemastores.ui.theme.newblue
+import com.darnitto.dakemastores.ui.theme.newblue1
 
 @Composable
 fun ProductDetailScreen(
@@ -26,8 +27,7 @@ fun ProductDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(newblue)
+            .background(newblue1)
     ) {
         Text(
             text = name,

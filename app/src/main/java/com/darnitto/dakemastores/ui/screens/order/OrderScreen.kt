@@ -4,6 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +26,7 @@ import com.darnitto.dakemastores.ui.theme.newblue1
 
 data class OrderItem(val title: String, val quantity: Int, val price: String, val imageRes: Int)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderTrackingScreen(navController: NavHostController) {
     val orderItems = listOf(
@@ -30,46 +35,116 @@ fun OrderTrackingScreen(navController: NavHostController) {
         OrderItem("Bluetooth Speaker", 1, "$49.01", R.drawable.product3)
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Order Summary & Tracking",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = newblack
-        )
+    // ********** SCAFFOLD START **********
+    Scaffold(
+        // ----- TOP BAR START -----
+        topBar = {
+            TopAppBar(
+                title = { Text("Order Tracking", color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = newblue1,
+                    titleContentColor = Color.White
+                ),
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.product),
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        },
+        // ----- TOP BAR END -----
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // ----- BOTTOM BAR START -----
+        bottomBar = {
+            BottomNavigationBar(navController)
+        },
+        // ----- BOTTOM BAR END -----
 
-        OrderSummaryCard(
-            orderNumber = "#DKM12345",
-            date = "April 30, 2025",
-            total = "$128.99",
-            status = "Out for Delivery"
-        )
+        // ----- CONTENT START -----
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(innerPadding)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Order Summary & Tracking",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = newblack
+                )
 
-        Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Items in this Order", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = newblack)
-        Spacer(modifier = Modifier.height(12.dp))
+                OrderSummaryCard(
+                    orderNumber = "#DKM12345",
+                    date = "April 30, 2025",
+                    total = "$128.99",
+                    status = "Out for Delivery"
+                )
 
-        orderItems.forEach { item ->
-            OrderItemRow(item)
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Items in this Order",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp,
+                    color = newblack
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                orderItems.forEach { item ->
+                    OrderItemRow(item)
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                TrackingSteps(
+                    steps = listOf("Order Placed", "Processing", "Shipped", "Out for Delivery", "Delivered"),
+                    currentStep = 3
+                )
+            }
         }
+        // ----- CONTENT END -----
+    )
+    // ********** SCAFFOLD END **********
+}
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TrackingSteps(
-            steps = listOf("Order Placed", "Processing", "Shipped", "Out for Delivery", "Delivered"),
-            currentStep = 3
+// ********** BOTTOM NAVIGATION BAR START **********
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    NavigationBar(
+        containerColor = newblue1,
+        contentColor = Color.White
+    ) {
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate("home") },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("Home") }
+        )
+        NavigationBarItem(
+            selected = true,
+            onClick = { /* Already on orders screen */ },
+            icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Orders") },
+            label = { Text("Orders") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate("profile") },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            label = { Text("Profile") }
         )
     }
 }
+// ********** BOTTOM NAVIGATION BAR END **********
 
 @Composable
 fun OrderSummaryCard(orderNumber: String, date: String, total: String, status: String) {

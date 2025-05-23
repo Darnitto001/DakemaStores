@@ -21,7 +21,7 @@ abstract class ProductDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ProductDatabase::class.java,
-                    "main_database"
+                    "Product_database"
                 )
                     .fallbackToDestructiveMigration() // 💥 This clears DB on version change
                     .build()

@@ -16,8 +16,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -26,11 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.darnitto.dakemastores.R
+import com.darnitto.dakemastores.navigation.ROUT_ADD_PRODUCT
 import com.darnitto.dakemastores.navigation.ROUT_DASHBOARD
 import com.darnitto.dakemastores.navigation.ROUT_HOME
 import com.darnitto.dakemastores.viewmodel.AuthViewModel
 import com.darnitto.dakemastores.navigation.ROUT_PRODUCT_LIST
 import com.darnitto.dakemastores.navigation.ROUT_REGISTER
+import com.darnitto.dakemastores.ui.theme.newblue
+import com.darnitto.dakemastores.ui.theme.newyellow
 
 
 @Composable
@@ -50,11 +55,11 @@ fun LoginScreen(
             if (user == null) {
                 Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
             } else {
-                if (user.role == "admin") {
+                if (user.role == "Buyer") {
                     navController.navigate(ROUT_HOME) {
                     }
                 } else {
-                    navController.navigate(ROUT_DASHBOARD) {
+                    navController.navigate(ROUT_ADD_PRODUCT) {
                     }
                 }
             }
@@ -65,9 +70,10 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(newblue)
             .padding(20.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Animated Welcome Text
         AnimatedVisibility(
@@ -78,7 +84,8 @@ fun LoginScreen(
             Text(
                 text = "Welcome Back!",
                 fontSize = 40.sp,
-                fontFamily = FontFamily.Cursive
+                fontFamily = FontFamily.Cursive,
+                color = newyellow
             )
         }
 
@@ -92,7 +99,7 @@ fun LoginScreen(
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -124,7 +131,7 @@ fun LoginScreen(
                 .height(50.dp)
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF00C6FF), Color(0xFF0072FF))
+                        colors = listOf(Color(0xFFFFC107), Color(0xFF8BC34A))
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ),
